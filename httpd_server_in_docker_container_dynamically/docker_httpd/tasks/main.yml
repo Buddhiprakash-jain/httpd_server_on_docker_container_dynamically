@@ -1,0 +1,13 @@
+  - name: "Installing httpd server"
+    package:
+            name: "httpd"
+            state: present
+
+
+  - name: "copy data into the file"
+    copy:
+            dest: "/var/www/html/index.html"
+            content: "Hlo from Docker Container"
+
+  - name: "Start httpd service"
+    command: "/usr/sbin/httpd"

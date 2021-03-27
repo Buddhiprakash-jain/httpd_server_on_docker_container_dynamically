@@ -1,0 +1,10 @@
+- name: "configuring docker"
+  hosts: localhost
+  roles:
+   - role: "docker_configure"
+
+- name: "configuring httpd server in docker container"
+  hosts: docker
+  roles:
+   - role: "docker_httpd"
+

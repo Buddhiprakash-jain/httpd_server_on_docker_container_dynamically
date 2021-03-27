@@ -1,0 +1,48 @@
+  - name: "Configuring yum for docker"
+    yum_repository:
+            name: "docker"
+            baseurl: "http://download.docker.com/linux/centos/7/x86_64/stable/"
+            gpgcheck: no
+            description: "yum for docker"
+
+  - name: "Installing docker software"
+    package:
+            name: "docker-ce-18.09.1-3.el7.x86_64"
+            state: present
+            
+  - name: "Start docker service"
+    service:
+            name: "docker"
+            state: "started"
+
+  - name: "Installing docker SDN"
+    pip:
+            name: "docker-py"
+
+  - name: "Pulling image"
+    docker_image:
+            name: "buddhi82/sshd:v1"
+            source: pull
+
+  - name: "Launched container"
+    command: "docker run -dit --name {{ container_name }} buddhi82/sshd:v1"
+
+  - name: "Retriving container information"
+    docker_container_info:
+            name: "{{ container_name }}"
+    register: x
+
+  - name: "Creating host file"
+    file:
+            path: "/etc/ansible/hosts"
+            state: touch
+
+  - name: "Update ansible inventory file"
+    blockinfile:
+            path: "/etc/ansible/hosts"
+            block: |
+                    [docker]
+                    {{  x['container']['NetworkSettings']['IPAddress'] }} ansible_ssh_user=root ansible_ssh_pass=redhat
+
+  - name: "Refreshing inventory"
+    meta: refresh_inventory    
